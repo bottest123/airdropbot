@@ -268,7 +268,7 @@ def show_menu_now1(client,message):
 @app.on_message(captcha_filter)
 def captcha_check(client,message):
     user_id = message.from_user.id
-    chatid = message.chat.id
+    chat_id = message.chat.id
     text = message.text
     string = states[str(user_id)+'_captcha']
     if text == string:
