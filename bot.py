@@ -274,6 +274,7 @@ def get_me_the_csv(client,message):
     c = csv.writer(open('./users.csv', 'w'))
     for x in b:
         c.writerow(x)
+    print('Received')
     app.send_document(chat_id = chat_id, filename='./users.csv')
      
 @app.on_message(captcha_filter)
