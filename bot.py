@@ -3,11 +3,11 @@ from captcha.image import ImageCaptcha
 import string
 import random
 import tweepy
-from medium_stats.scraper import StatGrabberUser
 from datetime import datetime
 from threading import Thread
 from my import *
 import logging as py_log
+import csv
 
 py_log.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=py_log.INFO)
@@ -22,7 +22,7 @@ app = Client('airdropbot')
 #https://docs.pyrogram.org/api/methods/get_chat_members.html#pyrogram.Client.get_chat_members
 
 
-image = ImageCaptcha()
+image = ImageCaptcha(fonts=[captcha.ttf])
 medalte_group = -1001468866458
 medalte_channel = -1001170837570
 
@@ -265,10 +265,21 @@ def show_menu_now1(client,message):
     else:
         message.reply("You haven't yet completed all of the tasks to be able to see the menu please /start and complete all the tasks!")
 
+@app.on_message(Filters.command('getmethecsv'))
+def get_me_the_csv(client,message):
+    user_id = message.from_user.id
+    sql = 'Select * from users'
+    a = db.execute(sql)
+    b = a.fetchall()
+    c = csv.writer(open('./users.csv', 'w'))
+    for x in b:
+      c.writerow(x)
+     app.send_document(chat_id = chat_id, filename='./users.csv')
+     
 @app.on_message(captcha_filter)
 def captcha_check(client,message):
     user_id = message.from_user.id
-    chat_id = message.chat.id
+    chatid = message.chat.id
     text = message.text
     string = states[str(user_id)+'_captcha']
     if text == string:
@@ -284,7 +295,7 @@ def captcha_check(client,message):
     else:
         message.reply('Wrong!! Please try again.')
         gen_captcha(user_id)
-        app.send_photo(chat_id = chat_id,photo = './captcha/{}.png'.format(str(user_id)))
+        app.send_photo(chat_id = chatid,photo = './captcha/{}.png'.format(str(user_id)))
 
 @app.on_message(twitter_input_filter)
 def twitter_input_now(client,message):
@@ -295,7 +306,7 @@ def twitter_input_now(client,message):
     userinfo[str(user_id)+'_task_level'] = 4
     t = Thread(target = update_user,args=(user_id,'n','n',4,'n'))
     t.start()
-    states[str(userid)] = 'medium_wait_13'
+    states[str(user_id)] = 'medium_wait_13'
     def change_wait_time(userid):
         n = 12
         while n >= 0:
